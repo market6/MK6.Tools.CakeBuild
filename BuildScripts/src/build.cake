@@ -4,7 +4,7 @@ BuildParams buildParams = BuildParams.GetParams(Context);
 
 // Include Cake files
 #load "build/core.dotnet.cake" 
-#load "build/params.cake"
+#load "build/core.params.cake"
 
 Task("Clean")
     .IsDependentOn("CoreClean")
