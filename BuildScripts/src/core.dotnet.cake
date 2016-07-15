@@ -15,11 +15,14 @@ Task("CoreRestoreNuGetPackages")
     .IsDependentOn("Clean")
     .Does(() =>
 {
-    NuGetRestore(buildParams.SolutionPath, new NuGetRestoreSettings {
-        Source = new List<string> {
-            EnvironmentVariable("NUGET_SOURCES")
-        }
-    });
+    if(HasEnvironmentVariable("NUGET_SOURCES")) 
+    {
+        var sources = new List<string>(EnvironmentVariable("NUGET_SOURCES").Split(';'));
+        NuGetRestore(buildParams.SolutionPath, new NuGetRestoreSettings { Source = sources });
+    }
+    else
+        NuGetRestore(buildParams.SolutionPath);
+    
 });
 
 Task("CoreBuild")
