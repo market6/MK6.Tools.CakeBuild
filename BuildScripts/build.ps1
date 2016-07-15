@@ -45,6 +45,8 @@ Param(
     [string]$Configuration = "Release",
     [ValidateSet("Quiet", "Minimal", "Normal", "Verbose", "Diagnostic")]
     [string]$Verbosity = "Verbose",
+    [string]$AppVer = "1.0.0",
+    [string]$SolutionPath,
     [switch]$Experimental,
     [Alias("DryRun","Noop")]
     [switch]$WhatIf,
@@ -81,6 +83,10 @@ if($Experimental.IsPresent -and !($Mono.IsPresent)) {
 $UseDryRun = "";
 if($WhatIf.IsPresent) {
     $UseDryRun = "-dryrun"
+}
+
+if($SolutionPath) {
+    $SolutionPath = "-solutionPath=`"$SolutionPath`""
 }
 
 # Make sure tools folder exists
@@ -141,5 +147,5 @@ if (!(Test-Path $CAKE_EXE)) {
 
 # Start Cake
 Write-Host "Running build script..."
-Invoke-Expression "& `"$CAKE_EXE`" `"$Script`" -target=`"$Target`" -configuration=`"$Configuration`" -verbosity=`"$Verbosity`" $UseMono $UseDryRun $UseExperimental $ScriptArgs"
+Invoke-Expression "& `"$CAKE_EXE`" `"$Script`" -target=`"$Target`" -configuration=`"$Configuration`" -appVer=`"$AppVer`" $SolutionPath -verbosity=`"$Verbosity`" $UseMono $UseDryRun $UseExperimental $ScriptArgs"
 exit $LASTEXITCODE

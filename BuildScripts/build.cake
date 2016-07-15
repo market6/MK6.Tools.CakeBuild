@@ -4,7 +4,7 @@ var target = Argument("target", "Default");
 Task("Package")
     .Does(() =>
 {
-    NuGetPack("./src/Tools.CakeBuild.nuspec", new NuGetPackSettings { Version = version, NoPackageAnalysis = true});
+    NuGetPack("./src/MK6.Tools.CakeBuild.nuspec", new NuGetPackSettings { Version = version, NoPackageAnalysis = true});
 });
 
 Task("Publish")
@@ -14,7 +14,7 @@ Task("Publish")
     var pushSource = Argument<string>("source");
     var apiKey = Argument<string>("apiKey");
 
-    var nupkgPath = string.Format("./Tools.CakeBuild.{0}.nupkg", version);
+    var nupkgPath = string.Format("./MK6.Tools.CakeBuild.{0}.nupkg", version);
     //Information("pushing package " + nupkgPath);
     NuGetPush(nupkgPath, new NuGetPushSettings {
         ApiKey = apiKey,
