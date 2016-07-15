@@ -7,8 +7,11 @@ var msBuildSettings = new MSBuildSettings()
 Task("CoreClean")
     .Does(() => 
     {
-        MSBuild(buildParams.SolutionPath, msBuildSettings.WithTarget("Clean"));
-        DeleteFiles("./*.nupkg");
+        using(TeamCity.BuildBlock("Executing CoreClean..."))
+        {
+            MSBuild(buildParams.SolutionPath, msBuildSettings.WithTarget("Clean"));
+            DeleteFiles("./*.nupkg");
+        }
     });
 
 Task("CoreRestoreNuGetPackages")
