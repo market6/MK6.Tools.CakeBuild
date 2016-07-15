@@ -11,7 +11,6 @@
   <files>
     <file src="build.cake" target="" />
     <file src="build.ps1" target="" />
-    <file src="core.dotnet.cake" target="build" />
-    <file src="params.cake" target="build" />
+    <file src="core.*" target="build" />
   </files>
 </package>
