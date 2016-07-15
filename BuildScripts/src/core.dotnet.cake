@@ -7,11 +7,8 @@ var msBuildSettings = new MSBuildSettings()
 Task("CoreClean")
     .Does(() => 
     {
-        using(TeamCity.BuildBlock("Executing CoreClean..."))
-        {
-            MSBuild(buildParams.SolutionPath, msBuildSettings.WithTarget("Clean"));
-            DeleteFiles("./*.nupkg");
-        }
+        MSBuild(buildParams.SolutionPath, msBuildSettings.WithTarget("Clean"));
+        DeleteFiles("./*.nupkg");
     });
 
 Task("CoreRestoreNuGetPackages")
@@ -36,6 +33,7 @@ Task("CorePackage")
     .IsDependentOn("Build")
     .Does(() =>
 {
+    TeamCity.WriteStartProgress("Started NuGet Packaging");
     var parsedSolution = ParseSolution(buildParams.SolutionPath);
     var nuspecs = GetFiles("./**/*.nuspec", fi => parsedSolution.Projects.Any(p => fi.Path.FullPath.EndsWith(p.Name)));
     foreach(var nuspec in nuspecs)
@@ -49,6 +47,7 @@ Task("CorePackage")
                                     NoPackageAnalysis = true
         });
     }
+    TeamCity.WriteEndProgress("Finished NuGet Packaging");
 
 
 });
