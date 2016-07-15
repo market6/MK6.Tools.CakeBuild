@@ -4,10 +4,9 @@ var target = Argument("target", "Default");
 Task("Package")
     .Does(() =>
 {
-    using(TeamCity.BuildBlock("Executing Package..."))
-    {
-      NuGetPack("./src/MK6.Tools.CakeBuild.nuspec", new NuGetPackSettings { Version = version, NoPackageAnalysis = true});
-    }
+    TeamCity.WriteStartProgress("Started NuGet Packaging");
+    NuGetPack("./src/MK6.Tools.CakeBuild.nuspec", new NuGetPackSettings { Version = version, NoPackageAnalysis = true});
+    TeamCity.WriteEndProgress("Finished NuGet Packaging");
 });
 
 Task("Publish")
