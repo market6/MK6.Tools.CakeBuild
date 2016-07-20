@@ -33,23 +33,16 @@ Task("CorePackage")
     .IsDependentOn("Build")
     .Does(() =>
 {
-    TeamCity.WriteStartProgress("Started NuGet Packaging");
     var parsedSolution = ParseSolution(buildParams.SolutionPath);
     var nuspecs = GetFiles("./**/*.nuspec", fi => parsedSolution.Projects.Any(p => fi.Path.FullPath.EndsWith(p.Name)));
     foreach(var nuspec in nuspecs)
     {
         NuGetPack(nuspec.FullPath, new NuGetPackSettings {
                                     Version = buildParams.Version,
-                                    //ReleaseNotes = parameters.ReleaseNotes.Notes.ToArray(),
-                                    //BasePath = parameters.Paths.Directories.ArtifactsBin,
-                                    //OutputDirectory = parameters.Paths.Directories.NugetRoot,
-                                    //Symbols = false,
+                                    Properties = new Dictionary<string, string>{ {"configuration", buildParams.Configuration} }
                                     NoPackageAnalysis = true
         });
     }
-    TeamCity.WriteEndProgress("Finished NuGet Packaging");
-
-
 });
 
 Task("CorePublish")

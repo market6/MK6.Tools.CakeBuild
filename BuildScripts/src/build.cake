@@ -1,10 +1,10 @@
+#load "build/core.params.cake"
 
 BuildParams buildParams = BuildParams.GetParams(Context);
 // Install addins.
 
 // Include Cake files
 #load "build/core.dotnet.cake" 
-#load "build/core.params.cake"
 
 Task("Clean")
     .IsDependentOn("CoreClean")
