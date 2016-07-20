@@ -39,7 +39,7 @@ Task("CorePackage")
     {
         NuGetPack(nuspec.FullPath, new NuGetPackSettings {
                                     Version = buildParams.Version,
-                                    Properties = new Dictionary<string, string>{ {"configuration", buildParams.Configuration} }
+                                    Properties = new Dictionary<string, string>{ {"configuration", buildParams.Configuration} },
                                     NoPackageAnalysis = true
         });
     }

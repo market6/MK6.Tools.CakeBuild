@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>MK6.Tools.CakeBuild.Grpc</id>
+    <version>$version$</version>
+    <authors>Market6</authors>
+    <owners>Market6</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Tools.CakeBuild.Grpc</description>
+  </metadata>
+  <files>
+    <file src="bin\$configuration$\MK6.Tools.CakeBuild.Grpc.*" target="" />
+  </files>
+</package>
