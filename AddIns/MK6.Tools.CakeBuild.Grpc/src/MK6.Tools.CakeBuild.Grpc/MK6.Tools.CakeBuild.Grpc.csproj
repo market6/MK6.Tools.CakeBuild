@@ -53,6 +53,7 @@
     <Compile Include="ProtoCompileToolResolver.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="MK6.Tools.CakeBuild.Grpc.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

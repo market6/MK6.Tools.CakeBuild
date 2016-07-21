@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>Tools.CakeBuild.Utils</id>
+    <id>MK6.Tools.CakeBuild.Core</id>
     <version>$version$</version>
     <authors>Market6</authors>
     <owners>Market6</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Tools.CakeBuild.Utils</description>
-    <dependencies>
-      <dependency id="Cake.Core" version="0.14.0" />
-    </dependencies>
+    <description>Core cake scripts</description>
   </metadata>
+  <files>
+    <file src="core.*" target="" />
+  </files>
 </package>
