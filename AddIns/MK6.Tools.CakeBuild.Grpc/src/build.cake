@@ -1,5 +1,3 @@
-//#tool nuget:?package=MK6.Tools.CakeBuild.Core
-
 #load "tools/MK6.Tools.CakeBuild.Core/core.params.cake"
 
 BuildParams buildParams = BuildParams.GetParams(Context);
