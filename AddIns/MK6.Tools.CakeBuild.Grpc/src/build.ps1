@@ -64,6 +64,7 @@ $NUGET_EXE = Join-Path $TOOLS_DIR "nuget.exe"
 $NUGET_URL = "http://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
 $CAKE_EXE = Join-Path $TOOLS_DIR "Cake/Cake.exe"
 $PACKAGES_CONFIG = Join-Path $TOOLS_DIR "packages.config"
+$PACKAGES_CONFIG_URL = "https://raw.githubusercontent.com/market6/MK6.Tools.CakeBuild/master/Bootstrapper/packages.config"
 
 # Should we use mono?
 $UseMono = "";
@@ -98,7 +99,7 @@ if ((Test-Path $PSScriptRoot) -and !(Test-Path $TOOLS_DIR)) {
 # Make sure that packages.config exist.
 if (!(Test-Path $PACKAGES_CONFIG)) {
     Write-Verbose -Message "Downloading packages.config..."
-    try { Invoke-WebRequest -Uri http://cakebuild.net/download/bootstrapper/packages -OutFile $PACKAGES_CONFIG } catch {
+    try { Invoke-WebRequest -Uri $PACKAGES_CONFIG_URL -OutFile $PACKAGES_CONFIG } catch {
         Throw "Could not download packages.config."
     }
 }

@@ -1,10 +1,13 @@
+//#tool nuget:?package=MK6.Tools.CakeBuild.Core
+
+#load "tools/MK6.Tools.CakeBuild.Core/core.params.cake"
 
 BuildParams buildParams = BuildParams.GetParams(Context);
+
 // Install addins.
 
-// Include Cake files
-#load "build/core.dotnet.cake" 
-#load "build/core.params.cake"
+// Include Additional Cake files
+#load "tools/MK6.Tools.CakeBuild.Core/core.dotnet.cake" 
 
 Task("Clean")
     .IsDependentOn("CoreClean")
@@ -41,7 +44,7 @@ Task("Publish")
 });
 
 Task("Default")
-  .IsDependentOn("Package")
+  .IsDependentOn("Build")
   .Does(() =>
 {
 
