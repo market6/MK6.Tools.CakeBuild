@@ -1,3 +1,4 @@
+#addin "Cake.FileHelpers"
 
 var msBuildSettings = new MSBuildSettings()
                             .SetConfiguration(buildParams.Configuration)
@@ -27,6 +28,7 @@ Task("CoreRestoreNuGetPackages")
 
 Task("CoreBuild")
     .IsDependentOn("RestoreNuGetPackages")
+    .IsDependentOn("UpdateAssemblyInfo")
     .Does(() => MSBuild(buildParams.SolutionPath, msBuildSettings.WithTarget("Build")));
 
 Task("CorePackage")
@@ -57,6 +59,27 @@ Task("CorePublish")
             ApiKey = EnvironmentVariable("NUGET_PUSH_API_KEY"),
             Source = EnvironmentVariable("NUGET_PUSH_SOURCE")
         });
+    }
+    
+});
+
+Task("CoreUpdateAssemblyInfo")
+    .Does(() =>
+{
+    var companyName = EnvironmentVariable("ASSEMBLY_INFO_COMPANY");
+
+    FilePath[] replacedFiles = null;
+    replacedFiles = ReplaceRegexInFiles("./**/AssemblyInfo.cs", @"AssemblyVersion[(][""](.*)[""][)]", String.Format("AssemblyVersion(\"{0}\")", buildParams.Version));
+    Information("Updated assembly version in the following files: " + string.Join("; ", replacedFiles.Select(x => x.FullPath)));
+    replacedFiles = ReplaceRegexInFiles("./**/AssemblyInfo.cs", @"AssemblyFileVersion[(][""](.*)[""][)]", String.Format("AssemblyFileVersion(\"{0}\")", buildParams.Version));
+    Information("Updated assembly file version in the following files: " + string.Join("; ", replacedFiles.Select(x => x.FullPath)));
+    
+    if(!string.IsNullOrEmpty(companyName))
+    {
+        replacedFiles = ReplaceRegexInFiles("./**/AssemblyInfo.cs", @"AssemblyCompany[(][""](.*)[""][)]", String.Format("AssemblyCompany(\"{0}\")", companyName));
+        Information("Updated assembly company name in the following files: " + string.Join("; ", replacedFiles.Select(x => x.FullPath)));
+        replacedFiles = ReplaceRegexInFiles("./**/AssemblyInfo.cs", @"AssemblyCopyright[(][""](.*)[""][)]", string.Format("AssemblyCopyright(\"Copyright (c) {1} {0}\")", DateTime.Now.Year, companyName));
+        Information("Updated assembly copyright in the following files: " + string.Join("; ", replacedFiles.Select(x => x.FullPath)));
     }
     
 });
