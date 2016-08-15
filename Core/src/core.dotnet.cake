@@ -35,9 +35,7 @@ Task("CorePackage")
     .IsDependentOn("Build")
     .Does(() =>
 {
-    var parsedSolution = ParseSolution(buildParams.SolutionPath);
-    var nuspecs = GetFiles("./**/*.nuspec", fi => parsedSolution.Projects.Any(p => fi.Path.FullPath.EndsWith(p.Name)));
-    foreach(var nuspec in nuspecs)
+    foreach(var nuspec in buildParams.NuspecPaths)
     {
         NuGetPack(nuspec.FullPath, new NuGetPackSettings {
                                     Version = buildParams.Version,
