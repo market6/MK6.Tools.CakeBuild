@@ -63,7 +63,11 @@ public class BuildParams
 		GitVersion gitVersion = null;
 		if(String.IsNullOrEmpty(version))
 		{
-			gitVersion = context.GitVersion(new GitVersionSettings { UpdateAssemblyInfo = false });
+      gitVersion = context.GitVersion(new GitVersionSettings 
+			{ 
+				UpdateAssemblyInfo = false,
+				WorkingDirectory = context.File(solutionPath).Path.GetDirectory() 
+			});
 			version = gitVersion.SemVer;
 			packVersion = gitVersion.NuGetVersion;
 		}
