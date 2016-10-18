@@ -63,7 +63,11 @@ public class BuildParams
 		GitVersion gitVersion = null;
 		if(String.IsNullOrEmpty(version))
 		{
-			var workingDir = context.MakeAbsolute(context.File(solutionPath).Path.GetDirectory());
+			var slnFilePath = context.File(solutionPath).Path;
+			if(slnFilePath.IsRelative)
+				slnFilePath = slnFilePath.MakeAbsolute(context.Environment);
+
+			var workingDir = slnFilePath.GetDirectory();
 			context.Information("Setting GitVersion WorkingDirectory to {0}", workingDir.FullPath);
       gitVersion = context.GitVersion(new GitVersionSettings 
 			{ 

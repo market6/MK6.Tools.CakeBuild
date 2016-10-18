@@ -18,14 +18,23 @@ Task("CoreRestoreNuGetPackages")
     .IsDependentOn("Clean")
     .Does(() =>
 {
-    if(HasEnvironmentVariable("NUGET_SOURCES")) 
+    var parsedSolution = ParseSolution(buildParams.SolutionPath);    
+    foreach(var project in parsedSolution.Projects.Where(x => x.Type == "{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}"))
     {
-        var sources = new List<string>(EnvironmentVariable("NUGET_SOURCES").Split(';'));
-        NuGetRestore(buildParams.SolutionPath, new NuGetRestoreSettings { Source = sources });
+        if(HasEnvironmentVariable("NUGET_SOURCES")) 
+        {
+            var sources = new List<string>(EnvironmentVariable("NUGET_SOURCES").Split(';'));
+            //NuGetRestore(buildParams.SolutionPath, new NuGetRestoreSettings { Source = sources });
+            var settings = new DotNetCoreRestoreSettings
+            {
+                Sources = sources,
+            };
+                        
+            DotNetCoreRestore(project.Path.GetDirectory().FullPath, settings);
+        }
+        else
+            DotNetCoreRestore(project.Path.GetDirectory().FullPath);
     }
-    else
-        NuGetRestore(buildParams.SolutionPath);
-    
 });
 
 Task("SetTeamCityBuildNumber")
@@ -103,7 +112,7 @@ Task("CoreUpdateAssemblyInfo")
     foreach(var project in parsedSolution.Projects.Where(x => x.Type == "{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}"))
     {
         var projectJson = project.Path.GetDirectory().CombineWithFilePath("project.json");
-        Information("Looking for project.json{0}: {0}", projectJson);
+        Information("Looking for project.json: {0}", projectJson);
         if(FileExists(projectJson))
         {
             Information("Found project.json: {0}", projectJson);
