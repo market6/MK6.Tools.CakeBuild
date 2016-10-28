@@ -42,7 +42,7 @@ Task("SetTeamCityBuildNumber")
 	.WithCriteria(TeamCity.IsRunningOnTeamCity)
 	.Does(() =>
 {
-	//TeamCity.SetBuildNumber(buildParams.GitVersion.FullSemVer);
+	TeamCity.SetBuildNumber(buildParams.GitVersion.FullSemVer);
 });
 
 Task("CoreBuild")
