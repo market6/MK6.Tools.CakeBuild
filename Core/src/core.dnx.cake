@@ -2,6 +2,7 @@
 #addin "Cake.Json"
 using Newtonsoft.Json;
 
+const string artifactsPath = "./artifacts/"; //TODO: FIX ME: Move this to env variable and default to ./artifacts
 var msBuildSettings = new MSBuildSettings()
                             .SetConfiguration(buildParams.Configuration)
                             .SetVerbosity(Verbosity.Minimal)
@@ -75,7 +76,7 @@ Task("CoreDNXPackage")
         var settings = new DotNetCorePackSettings
         {
             Configuration = buildParams.Configuration,
-            OutputDirectory = "./artifacts/" //TODO: FIX ME: Move this to env variable and default to ./artifacts
+            OutputDirectory = artifactsPath
         };
                     
         DotNetCorePack(project.Path.GetDirectory().FullPath, settings);    
@@ -89,15 +90,13 @@ Task("CorePublish")
     .Does(() =>
 {
     var parsedSolution = ParseSolution(buildParams.SolutionPath);
-    var nupkgs = GetFiles("./*.nupkg").Where(fi => parsedSolution.Projects.Any(p => string.Format("{0}.{1}.nupkg", p.Name, buildParams.Version) == fi.GetFilename().ToString()));
-    foreach(var nupkg in nupkgs)
-    {
-        NuGetPush(nupkg.FullPath, new NuGetPushSettings {
+    var filter = MakeAbsolute(Directory(artifactsPath).Path) + "/*.nupkg";
+    var nupkgs = GetFiles(filter).Where(fi => parsedSolution.Projects.Any(p => fi.GetFilename().ToString().StartsWith(p.Name)));
+    //Information(nupkgs.Count().ToString());
+    NuGetPush(nupkgs, new NuGetPushSettings {
             ApiKey = EnvironmentVariable("NUGET_PUSH_API_KEY"),
             Source = EnvironmentVariable("NUGET_PUSH_SOURCE")
-        });
-    }
-    
+        });    
 });
 
 Task("CoreUpdateAssemblyInfo")
@@ -119,7 +118,7 @@ Task("CoreUpdateAssemblyInfo")
             Information("Parsing project.json...");
             var jo = ParseJsonFromFile(projectJson);
             Information("Setting version to: {0}...", buildParams.PackageVersion);
-            jo["version"] = buildParams.Version;
+            jo["version"] = buildParams.PackageVersion;
             Information("Updating project.json...");
             SerializeJsonToFile(projectJson, jo);
         }
