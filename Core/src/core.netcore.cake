@@ -45,10 +45,10 @@ Task("SetTeamCityBuildNumber")
 Task("CoreBuild")
     .IsDependentOn("SetTeamCityBuildNumber")
     .IsDependentOn("RestoreNuGetPackages")
-    .IsDependentOn("UpdateAssemblyInfo")
+    .IsDependentOn("CoreUpdateVersion")
     .Does(() => DotNetCoreBuild(buildParams.SolutionPath, new DotNetCoreBuildSettings { Configuration = buildParams.Configuration }));
 
-Task("CorePackage")
+Task("CoreLibPackage")
     .IsDependentOn("Build")
     .Does(() =>
 {
@@ -74,8 +74,8 @@ Task("CorePackage")
     
 });
 
-Task("CorePublish")
-    .IsDependentOn("Package")
+Task("CoreLibPublish")
+    .IsDependentOn("LibPackage")
     .Does(() =>
 {
     var parsedSolution = ParseSolution(buildParams.SolutionPath);
@@ -86,6 +86,32 @@ Task("CorePublish")
             ApiKey = EnvironmentVariable("NUGET_PUSH_API_KEY"),
             Source = EnvironmentVariable("NUGET_PUSH_SOURCE")
         });    
+});
+
+Task("CoreAppPublish")
+    .IsDependentOn("Build")
+    .Does(() =>
+{
+    var parsedSolution = ParseSolution(buildParams.SolutionPath);
+    foreach(var project in parsedSolution.Projects)
+    {
+        Verbose("XmlPeek " + project.Path);
+        var outputType = XmlPeek(project.Path, "/Project/PropertyGroup/OutputType/text()");
+        Verbose("outputType: " + outputType ?? "");
+        if(!string.IsNullOrEmpty(outputType) && outputType.Equals("EXE", StringComparison.OrdinalIgnoreCase))
+        {
+            var publishPath = artifactsPath + "/" + project.Name;
+            DeleteFiles(publishPath + "/**");
+            var settings = new DotNetCorePublishSettings
+            {
+                Configuration = buildParams.Configuration,
+                OutputDirectory = publishPath,
+                Runtime = "win8-x64"
+            };
+                        
+            DotNetCorePublish(project.Path.GetDirectory().FullPath, settings);    
+        }
+    }   
 });
 
 Task("CoreUpdateVersion")

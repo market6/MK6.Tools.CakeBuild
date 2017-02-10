@@ -26,17 +26,20 @@ function writeHelpOutput() {
 }
 
 $PSScriptRoot = split-path -parent $MyInvocation.MyCommand.Definition;
-$BUILD_CAKE_URL = "https://raw.githubusercontent.com/market6/MK6.Tools.CakeBuild/master/Bootstrapper/build.cake"
+$BUILD_CAKE_URL = "https://raw.githubusercontent.com/market6/MK6.Tools.CakeBuild/master/Bootstrapper/build.netfx.cake"
+$BUILD_CAKE_CORE_URL = "https://raw.githubusercontent.com/market6/MK6.Tools.CakeBuild/master/Bootstrapper/build.netcore.cake"
 $BUILD_PS1_URL = "https://raw.githubusercontent.com/market6/MK6.Tools.CakeBuild/master/Bootstrapper/build.ps1"
 
 Write-Host "Downloading build files..." -ForegroundColor White
-$cakeFilePath = Join-Path $PSScriptRoot "build.cake"
+$cakeFilePath = Join-Path $PSScriptRoot "build.netfx.cake"
+$cakeCoreFilePath = Join-Path $PSScriptRoot "build.netcore.cake"
 $buildPs1Path = Join-Path $PSScriptRoot "build.ps1"
 if(($Force.IsPresent -ne $True) -and ((Test-Path $cakeFilePath) -or (Test-Path $buildPs1Path))) {
   Write-Warning "Skipping copying of build.cake/.ps1 since they already exist. Use -Force to overwrite them."
 }
 else {
   Invoke-WebRequest -Uri $BUILD_CAKE_URL -OutFile $cakeFilePath
+  Invoke-WebRequest -Uri $BUILD_CAKE_CORE_URL -OutFile $cakeCoreFilePath
   Invoke-WebRequest -Uri $BUILD_PS1_URL -OutFile $buildPs1Path
   writeHelpOutput
 }
