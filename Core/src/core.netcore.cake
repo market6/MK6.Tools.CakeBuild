@@ -17,7 +17,7 @@ Task("CoreRestoreNuGetPackages")
     .Does(() =>
 {
     var parsedSolution = ParseSolution(buildParams.SolutionPath);    
-    foreach(var project in parsedSolution.Projects.Where(x => x.Type == "{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}"))
+    foreach(var project in parsedSolution.Projects)
     {
         if(HasEnvironmentVariable("NUGET_SOURCES")) 
         {
