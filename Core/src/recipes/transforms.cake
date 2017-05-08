@@ -4,7 +4,7 @@ Task("Transform")
   EnsureDirectoryExists(parameters.Paths.Directories.ConfigsDirectory);
   CleanDirectories(parameters.Paths.Directories.ConfigsDirectory.FullPath);
   //TODO: Add support for web.configs
-  var appConfigGlobPattern = parameters.Paths.Directories.Source.FullPath + "/**/App.*.Config";
+  var appConfigGlobPattern = parameters.Paths.Directories.TempBuild.FullPath + "/App.*.Config";
   Information("Performing transforms on app configs using glob pattern: {0}", appConfigGlobPattern);
   foreach(var file in GetFiles(appConfigGlobPattern))
   {
@@ -16,13 +16,11 @@ Task("Transform")
         Error("Error during transform. Unable to determine the executable path: {0} found in TempBuild folder {1}", possibleExecutables.Count == 0 ? "No executables" : "Multiple executables", parameters.Paths.Directories.TempBuild.FullPath);
   }
 
-
-  var webConfigGlobPattern = parameters.Paths.Directories.Source.FullPath + "/**/Web.*.Config";
+  var webConfigGlobPattern = parameters.Paths.Directories.PublishedWebsites.FullPath + "/**/Web.*.Config";
   Information("Performing transforms on web configs using glob pattern: {0}", webConfigGlobPattern);
   foreach(var file in GetFiles(webConfigGlobPattern))
   {
       Information("Transform: {0}", file);
-      FilePath executablePath;
       TransormConfigs(Context, file, parameters.Paths.Directories.ConfigsDirectory);
   }
 

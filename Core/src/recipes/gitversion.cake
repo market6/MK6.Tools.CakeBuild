@@ -4,6 +4,7 @@ public class BuildVersion
     public string SemVersion { get; private set; }
     public string Milestone { get; private set; }
     public string CakeVersion { get; private set; }
+    public bool IsPreRelease { get; private set; }
     public GitVersion GitVersion { get; private set; }
 
     public static BuildVersion CalculatingSemanticVersion(
@@ -66,7 +67,8 @@ public class BuildVersion
             SemVersion = semVersion,
             Milestone = milestone,
             CakeVersion = cakeVersion,
-            GitVersion = gitVersion
+            GitVersion = gitVersion,
+            IsPreRelease = !string.IsNullOrEmpty(gitVersion.PreReleaseLabel)
         };
     }
 }

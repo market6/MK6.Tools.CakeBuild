@@ -1,3 +1,5 @@
+#addin "Cake.Incubator"
+
 ///////////////////////////////////////////////////////////////////////////////
 // TOOLS
 ///////////////////////////////////////////////////////////////////////////////
@@ -13,19 +15,40 @@ Task("CreateOctoPackage")
     .IsDependentOn("Transform")
     .Does(() =>
 {
-    var basePath = MakeAbsolute(parameters.Paths.Directories.TempBuild);
-    var artifactsPath = MakeAbsolute(parameters.Paths.Directories.Build);
-    Verbose("basePath: " + basePath.FullPath);	
-    Verbose("octopusProjectName: " + octopusProjectName);	
+    EnsureDirectoryExists(parameters.Paths.Directories.NuGetPackages);
+    var artifactsPath = MakeAbsolute(parameters.Paths.Directories.NuGetPackages);
 
-    OctoPack(octopusProjectName, new OctopusPackSettings 
+    if(DirectoryExists(parameters.Paths.Directories.PublishedWebsites))
     {
-        BasePath = basePath,
-        Format = OctopusPackFormat.NuPkg,
-        Version = parameters.Version.SemVersion,
-        OutFolder = artifactsPath,
-        Overwrite = true
-    });
+        foreach(var webApp in GetDirectories(parameters.Paths.Directories.PublishedWebsites.FullPath + "/*"))
+        {
+            CopyDirectory(parameters.Paths.Directories.ConfigsDirectory, webApp.Combine(parameters.Paths.Directories.ConfigsDirectory.GetDirectoryName()));
+            CopyDirectory(parameters.Paths.Directories.NativeLibsDirectory, webApp.Combine("bin").Combine(parameters.Paths.Directories.NativeLibsDirectory.GetDirectoryName()));
+            DeleteDirectory(webApp.Combine(parameters.Paths.Directories.NativeLibsDirectory.GetDirectoryName()), true);
+            DeleteFiles(webApp.FullPath + "/Web.*.config");
+            DeleteFiles(webApp.FullPath + "/Web.config");
+            OctoPack(webApp.GetDirectoryName(), new OctopusPackSettings 
+            {
+                BasePath = MakeAbsolute(webApp),
+                Format = OctopusPackFormat.NuPkg,
+                Version = parameters.Version.SemVersion,
+                OutFolder = artifactsPath,
+                Overwrite = true
+            });
+        }
+    }
+    else
+    { 
+        OctoPack(octopusProjectName, new OctopusPackSettings 
+        {
+            BasePath = MakeAbsolute(parameters.Paths.Directories.TempBuild),
+            Format = OctopusPackFormat.NuPkg,
+            Version = parameters.Version.SemVersion,
+            OutFolder = artifactsPath,
+            Overwrite = true
+        });
+    }
+    
 });
 
 Task("CreateOctoRelease")
@@ -47,14 +70,23 @@ Task("CreateOctoRelease")
         }
 	}
 
-    OctoCreateRelease(octopusProjectName, new CreateReleaseSettings {
-        Server = EnvironmentVariable(octopusUrlVariable),
-        ApiKey = EnvironmentVariable(octopusApiKeyVariable),
-        EnableServiceMessages = true,
-		    ReleaseNumber = parameters.Version.SemVersion, //string.Format("{0}.i", parameters.Version.MajorMinorPatch),
-        DefaultPackageVersion = parameters.Version.SemVersion,
-		    ReleaseNotes = latestReleaseNotes
-    });
+    var settings = new CreateReleaseSettings {
+            Server = EnvironmentVariable(octopusUrlVariable),
+            ApiKey = EnvironmentVariable(octopusApiKeyVariable),
+            EnableServiceMessages = true,
+            ReleaseNumber = string.Format("{0}.i-{1}{2}", parameters.Version.GitVersion.MajorMinorPatch, parameters.Version.GitVersion.PreReleaseLabel, parameters.Version.GitVersion.CommitsSinceVersionSourcePadded),
+            DefaultPackageVersion = parameters.Version.SemVersion,
+            ReleaseNotes = latestReleaseNotes
+        };
+
+    if(parameters.IsLocalBuild)
+    {
+        Information(settings.Dump<CreateReleaseSettings>());
+    }
+    else
+    {
+        OctoCreateRelease(octopusProjectName, settings);
+    }
 });
 
 

@@ -5,12 +5,13 @@
 var parameters = BuildParameters.GetParameters(Context, BuildSystem);//, repositoryOwner, repositoryName);
 var publishingError = false;
 
-var config = Config.BuildJsonConfig("build.json");
-string sourceDirectoryPath = config.SourceDirectoryPath;
-string title = config.Title;
-string solutionFilePath = config.SolutionFilePath;
-string solutionDirectoryPath = config.SolutionDirectoryPath;
-string octopusProjectName = config.OctopusProjectName;
+var config = Config.BuildJsonConfig(parameters.BuildConfigFilePath.FullPath);
+var sourceDirectoryPath = Context.MakeAbsolute((DirectoryPath)config.SourceDirectoryPath);
+var title = config.Title;
+var solutionFilePath = Context.MakeAbsolute((FilePath)config.SolutionFilePath);
+var solutionDirectoryPath = Context.MakeAbsolute((DirectoryPath)config.SolutionDirectoryPath);
+var octopusProjectName = config.OctopusProjectName;
+var testAssemblySearchPattern = config.TestAssemblySearchPattern;
 
 ///////////////////////////////////////////////////////////////////////////////
 // SETUP / TEARDOWN
@@ -18,6 +19,7 @@ string octopusProjectName = config.OctopusProjectName;
 
 Setup(context =>
 {
+    
     // if(parameters.IsMasterBranch && (context.Log.Verbosity != Verbosity.Diagnostic)) {
     //     Information("Increasing verbosity to diagnostic.");
     //     context.Log.Verbosity = Verbosity.Diagnostic;
@@ -28,6 +30,9 @@ Setup(context =>
             context: Context
         )
     );
+
+    if(TeamCity.IsRunningOnTeamCity)
+        StartProcess("git", "fetch --tags");
 
     parameters.SetBuildVersion(
         BuildVersion.CalculatingSemanticVersion(
@@ -41,38 +46,21 @@ Setup(context =>
         parameters.Configuration,
         parameters.Target,
         parameters.Version.CakeVersion);
+
+    SetupDefaultEnvironment(context, parameters);
 });
 
-Teardown(context =>
-{
-    if(context.Successful)
-    {
-        // if(!parameters.IsLocalBuild && !parameters.IsPullRequest && parameters.IsMainRepository && parameters.IsMasterBranch && parameters.IsTagged)
-        // {
-        //     if(sendMessageToTwitter)
-        //     {
-        //         SendMessageToTwitter("Version " + parameters.Version.SemVersion + " of " + title + " Addin has just been released, https://www.nuget.org/packages/" + title + ".");
-        //     }
+// Teardown(context =>
+// {
+//     if(context.Successful)
+//     {
+//     }
+//     else
+//     {
+//     }
 
-        //     if(sendMessageToGitterRoom)
-        //     {
-        //         SendMessageToGitterRoom("@/all Version " + parameters.Version.SemVersion + " of the " + title + " Addin has just been released, https://www.nuget.org/packages/" + title + ".");
-        //     }
-        // }
-    }
-    else
-    {
-        // if(!parameters.IsLocalBuild && parameters.IsMainRepository)
-        // {
-        //     if(sendMessageToSlackChannel)
-        //     {
-        //         SendMessageToSlackChannel("Continuous Integration Build of " + title + " just failed :-(");
-        //     }
-        // }
-    }
-
-    Information("Finished running tasks.");
-});
+//     Information("Finished running tasks.");
+// });
 
 ///////////////////////////////////////////////////////////////////////////////
 // TASK DEFINITIONS
@@ -88,7 +76,36 @@ Task("Show-Info")
     Information("Solution DirectoryPath: {0}", MakeAbsolute((DirectoryPath)solutionDirectoryPath));
     Information("Source DirectoryPath: {0}", MakeAbsolute(parameters.Paths.Directories.Source));
     Information("Build DirectoryPath: {0}", MakeAbsolute(parameters.Paths.Directories.Build));
+    Information("IsMasterBranch: {0}", parameters.IsMasterBranch);
+    
 });
+
+private void SetupDefaultEnvironment(ICakeContext context, BuildParameters parameters)
+{
+    if(parameters.IsLocalBuild)
+    {
+        Information("Environment variables....");
+        SetVariable(context, localNugetSourceVariable,localNugetSourceDefaultValue);
+        SetVariable(context, nuGetSourcesVariable, nugetSourcesDefaultValue);
+        SetVariable(context, nuGetSourceCIUrlVariable, klondikeCIUrlDefault);
+        SetVariable(context, nuGetSymbolSourceUrlVariable, nugetEnableSymbolsDefaultValue);
+        SetVariable(context, octopusUrlVariable, octopusUrlVariableDefaultValue);
+        SetVariable(context, octopusApiKeyVariable, octopusApiKeyVariableDefaultValue);
+    }
+}
+private void SetVariable(ICakeContext context, string variableName, string defaultValue)
+{
+    context.Information("{0} : {1}", variableName, Environment.GetEnvironmentVariable(variableName));
+    
+    if(!context.HasEnvironmentVariable(variableName))
+    {
+        context.Warning("Setting EnvrionmentVariable {0} to {1}",variableName, defaultValue);
+        Environment.SetEnvironmentVariable(variableName, defaultValue);
+    }
+
+    context.Information("{0} : {1}", variableName, Environment.GetEnvironmentVariable(variableName));
+    
+}
 
 Task("Clean")
     .Does(() =>
@@ -102,15 +119,27 @@ Task("Restore")
     .Does(() =>
 {
     Information("Restoring {0}...", solutionFilePath);
-    IList<string> source;
     var sourceString = EnvironmentVariable(nuGetSourcesVariable);
-    if(string.IsNullOrEmpty(sourceString))
-        source = new List<string> { "https://www.nuget.org/api/v2", "http://packages.mk6.local/api/odata" };
-    else
+    
+    if(!parameters.IsMasterBranch)
     {
-        Verbose("Using nuget source(s) from env variable {0} for restore: {1}", nuGetSourcesVariable, sourceString);
-        source = sourceString.Split(';').ToList();
+        if(sourceString == null)
+            sourceString = string.Empty;
+        
+        sourceString += ";" + EnvironmentVariable(nuGetSourceCIUrlVariable);
     }
+
+    if(parameters.IsLocalBuild)
+    {
+        if(sourceString == null)
+            sourceString = string.Empty;
+        
+        sourceString += ";" + (HasEnvironmentVariable(localNugetSourceVariable) ? EnvironmentVariable(localNugetSourceVariable) : localNugetSourceDefaultValue);
+    }
+
+    Verbose("Using nuget source(s) for restore: {0}", sourceString);
+
+    var source = sourceString.Split(';').ToList();
     NuGetRestore(solutionFilePath, new NuGetRestoreSettings { Source = source });
 });
 
@@ -122,10 +151,9 @@ Task("Build")
 {
     Information("Building {0}", solutionFilePath);
 
-    // TODO: Need to have an XBuild step here as well
     MSBuild(solutionFilePath, settings =>
         settings.SetPlatformTarget(PlatformTarget.MSIL)
-            .WithProperty("TreatWarningsAsErrors","true")
+            .WithProperty("TreatWarningsAsErrors", "false")
             .WithProperty("OutDir", MakeAbsolute(parameters.Paths.Directories.TempBuild).FullPath)
             .WithTarget("Build")
             .SetConfiguration(parameters.Configuration));

@@ -8,6 +8,7 @@ public class Config
   public string SolutionFilePath { get; set; }
   public string SolutionDirectoryPath { get; set; }
   public string OctopusProjectName { get; set; }
+  public string TestAssemblySearchPattern { get; set; }
 
   public static Config BuildJsonConfig(string configPath)
   {
