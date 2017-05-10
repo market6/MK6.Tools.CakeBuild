@@ -153,6 +153,8 @@ Task("Build")
 
     MSBuild(solutionFilePath, settings =>
         settings.SetPlatformTarget(PlatformTarget.MSIL)
+            //.AddFileLogger()
+            //.SetVerbosity(Verbosity.Verbose)
             .WithProperty("TreatWarningsAsErrors", "false")
             .WithProperty("OutDir", MakeAbsolute(parameters.Paths.Directories.TempBuild).FullPath)
             .WithTarget("Build")

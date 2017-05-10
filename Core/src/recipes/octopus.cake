@@ -22,9 +22,14 @@ Task("CreateOctoPackage")
     {
         foreach(var webApp in GetDirectories(parameters.Paths.Directories.PublishedWebsites.FullPath + "/*"))
         {
-            CopyDirectory(parameters.Paths.Directories.ConfigsDirectory, webApp.Combine(parameters.Paths.Directories.ConfigsDirectory.GetDirectoryName()));
-            CopyDirectory(parameters.Paths.Directories.NativeLibsDirectory, webApp.Combine("bin").Combine(parameters.Paths.Directories.NativeLibsDirectory.GetDirectoryName()));
-            DeleteDirectory(webApp.Combine(parameters.Paths.Directories.NativeLibsDirectory.GetDirectoryName()), true);
+            if(DirectoryExists(parameters.Paths.Directories.ConfigsDirectory))
+                CopyDirectory(parameters.Paths.Directories.ConfigsDirectory, webApp.Combine(parameters.Paths.Directories.ConfigsDirectory.GetDirectoryName()));
+            if(DirectoryExists(parameters.Paths.Directories.NativeLibsDirectory))
+            {
+                CopyDirectory(parameters.Paths.Directories.NativeLibsDirectory, webApp.Combine("bin").Combine(parameters.Paths.Directories.NativeLibsDirectory.GetDirectoryName()));
+                DeleteDirectory(webApp.Combine(parameters.Paths.Directories.NativeLibsDirectory.GetDirectoryName()), true);
+            }
+            
             DeleteFiles(webApp.FullPath + "/Web.*.config");
             DeleteFiles(webApp.FullPath + "/Web.config");
             OctoPack(webApp.GetDirectoryName(), new OctopusPackSettings 

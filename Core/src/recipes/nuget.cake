@@ -4,7 +4,7 @@ Task("Create-NuGet-Packages")
     .Does(() =>
 {
     Information("NugetNuspecDirectory: {0}", parameters.Paths.Directories.NugetNuspecDirectory);
-    var nuspecFiles = GetFiles(parameters.Paths.Directories.NugetNuspecDirectory + "/" + parameters.BuildConfigFilePath.FullPath.Replace(".json", "") + "/*.nuspec");
+    var nuspecFiles = GetFiles(parameters.Paths.Directories.NugetNuspecDirectory + "/*.nuspec");
 
     EnsureDirectoryExists(parameters.Paths.Directories.NuGetPackages);
 
@@ -15,19 +15,19 @@ Task("Create-NuGet-Packages")
             enableSymbols = true;
     }
 
+    if(enableSymbols)
+    {
+        var srcDir = parameters.Paths.Directories.TempBuild.Combine("src");
+        EnsureDirectoryExists(srcDir);
+        CleanDirectory(srcDir);
+        CopyFiles(parameters.Paths.Directories.Source + "/**/*.cs", srcDir, false);
+    }
 
     foreach(var nuspecFile in nuspecFiles)
     {
-        if(enableSymbols)
-        {
-            var srcDir = parameters.Paths.Directories.TempBuild.Combine("src");
-            EnsureDirectoryExists(srcDir);
-        }
-
-        // TODO: Addin the release notes
+         // TODO: Addin the release notes
         // ReleaseNotes = parameters.ReleaseNotes.Notes.ToArray(),
 
-        // Create packages.
         NuGetPack(nuspecFile, new NuGetPackSettings {
             BasePath = parameters.Paths.Directories.TempBuild,
             Version = parameters.Version.SemVersion,
