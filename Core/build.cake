@@ -6,11 +6,14 @@ var target = Argument("target", "Default");
 Setup(context =>
 {
     version = context.GitVersion();
+    context.Information("Version: {0}", version.FullSemVer);
+    context.Information("Package Version: {0}", version.NuGetVersionV2);
 });
 
 Task("Package")
     .Does(() =>
 {
+    DeleteFiles("*.nupkg");
     NuGetPack("./src/MK6.Tools.CakeBuild.Core.nuspec", new NuGetPackSettings { Version = version.NuGetVersionV2, NoPackageAnalysis = true});
 });
 

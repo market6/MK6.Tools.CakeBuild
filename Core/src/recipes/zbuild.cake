@@ -11,6 +11,7 @@ var title = config.Title;
 var solutionFilePath = Context.MakeAbsolute((FilePath)config.SolutionFilePath);
 var solutionDirectoryPath = Context.MakeAbsolute((DirectoryPath)config.SolutionDirectoryPath);
 var octopusProjectName = config.OctopusProjectName;
+var octopusReleaseNumberFormat = config.OctopusReleaseNumberFormat;
 var testAssemblySearchPattern = config.TestAssemblySearchPattern;
 
 ///////////////////////////////////////////////////////////////////////////////

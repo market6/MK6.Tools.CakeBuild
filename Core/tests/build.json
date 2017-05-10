@@ -3,5 +3,6 @@
   "Title": "NewBuildTest",
   "SolutionFilePath": "NewBuildTest/NewBuildTest.sln",
   "SolutionDirectoryPath": "NewBuildTest",
-  "OctopusProjectName": "NewBuildTest"
+  "OctopusProjectName": "NewBuildTest",
+  "OctopusReleaseNumberFormat" : "{MajorMinorPatch}.i"
 }

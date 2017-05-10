@@ -75,11 +75,20 @@ Task("CreateOctoRelease")
         }
 	}
 
+    var releaseNumberFormat = String.IsNullOrEmpty(octopusReleaseNumberFormat) ?  "{NuGetVersionV2}" : octopusReleaseNumberFormat;
+
+    Information("Building release number using format: {0}", releaseNumberFormat);
+
+    var releaseNumber = BuildReleaseNumber(parameters.Version.GitVersion, releaseNumberFormat);
+    
+    Information("Using release number: {0}", releaseNumber);
+    
+
     var settings = new CreateReleaseSettings {
             Server = EnvironmentVariable(octopusUrlVariable),
             ApiKey = EnvironmentVariable(octopusApiKeyVariable),
             EnableServiceMessages = true,
-            ReleaseNumber = string.Format("{0}.i-{1}{2}", parameters.Version.GitVersion.MajorMinorPatch, parameters.Version.GitVersion.PreReleaseLabel, parameters.Version.GitVersion.CommitsSinceVersionSourcePadded),
+            ReleaseNumber = releaseNumber, //string.Format("{0}.i-{1}{2}", parameters.Version.GitVersion.MajorMinorPatch, parameters.Version.GitVersion.PreReleaseLabel, parameters.Version.GitVersion.CommitsSinceVersionSourcePadded),
             DefaultPackageVersion = parameters.Version.SemVersion,
             ReleaseNotes = latestReleaseNotes
         };
@@ -98,3 +107,19 @@ Task("CreateOctoRelease")
 ///////////////////////////////////////////////////////////////////////////////
 // HELPER METHODS
 ///////////////////////////////////////////////////////////////////////////////
+using System.Reflection;
+
+static string BuildReleaseNumber(GitVersion version, string releaseNumberFormat)
+{
+    //var releaseNumber = string.Empty;
+    var properties = version.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance).OrderBy(p => p.Name);
+
+    foreach (var p in properties)
+    {
+        var token = "{" + p.Name + "}";
+        releaseNumberFormat = releaseNumberFormat.Replace(token, p.GetValue(version).ToString());
+    }
+
+    return releaseNumberFormat;
+
+}
