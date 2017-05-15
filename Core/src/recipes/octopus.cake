@@ -24,12 +24,22 @@ Task("CreateOctoPackage")
         {
             if(DirectoryExists(parameters.Paths.Directories.ConfigsDirectory))
                 CopyDirectory(parameters.Paths.Directories.ConfigsDirectory, webApp.Combine(parameters.Paths.Directories.ConfigsDirectory.GetDirectoryName()));
+            
             if(DirectoryExists(parameters.Paths.Directories.NativeLibsDirectory))
             {
                 CopyDirectory(parameters.Paths.Directories.NativeLibsDirectory, webApp.Combine("bin").Combine(parameters.Paths.Directories.NativeLibsDirectory.GetDirectoryName()));
                 DeleteDirectory(webApp.Combine(parameters.Paths.Directories.NativeLibsDirectory.GetDirectoryName()), true);
             }
             
+            if(FileExists("Deploy.ps1"))
+            {
+                Information("Copying Deploy.ps1...");
+                CopyFile("Deploy.ps1", webApp.CombineWithFilePath("Deploy.ps1"));
+            }
+            else
+                Warning("Deploy.ps1 not found!");
+            
+
             DeleteFiles(webApp.FullPath + "/Web.*.config");
             DeleteFiles(webApp.FullPath + "/Web.config");
             OctoPack(webApp.GetDirectoryName(), new OctopusPackSettings 
@@ -75,20 +85,11 @@ Task("CreateOctoRelease")
         }
 	}
 
-    var releaseNumberFormat = String.IsNullOrEmpty(octopusReleaseNumberFormat) ?  "{NuGetVersionV2}" : octopusReleaseNumberFormat;
-
-    Information("Building release number using format: {0}", releaseNumberFormat);
-
-    var releaseNumber = BuildReleaseNumber(parameters.Version.GitVersion, releaseNumberFormat);
-    
-    Information("Using release number: {0}", releaseNumber);
-    
-
     var settings = new CreateReleaseSettings {
             Server = EnvironmentVariable(octopusUrlVariable),
             ApiKey = EnvironmentVariable(octopusApiKeyVariable),
             EnableServiceMessages = true,
-            ReleaseNumber = releaseNumber, //string.Format("{0}.i-{1}{2}", parameters.Version.GitVersion.MajorMinorPatch, parameters.Version.GitVersion.PreReleaseLabel, parameters.Version.GitVersion.CommitsSinceVersionSourcePadded),
+            ReleaseNumber = string.Format("{0}.i-{1}{2}", parameters.Version.GitVersion.MajorMinorPatch, parameters.Version.GitVersion.PreReleaseLabel, parameters.Version.GitVersion.CommitsSinceVersionSourcePadded),
             DefaultPackageVersion = parameters.Version.SemVersion,
             ReleaseNotes = latestReleaseNotes
         };
@@ -107,19 +108,3 @@ Task("CreateOctoRelease")
 ///////////////////////////////////////////////////////////////////////////////
 // HELPER METHODS
 ///////////////////////////////////////////////////////////////////////////////
-using System.Reflection;
-
-static string BuildReleaseNumber(GitVersion version, string releaseNumberFormat)
-{
-    //var releaseNumber = string.Empty;
-    var properties = version.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance).OrderBy(p => p.Name);
-
-    foreach (var p in properties)
-    {
-        var token = "{" + p.Name + "}";
-        releaseNumberFormat = releaseNumberFormat.Replace(token, p.GetValue(version).ToString());
-    }
-
-    return releaseNumberFormat;
-
-}
