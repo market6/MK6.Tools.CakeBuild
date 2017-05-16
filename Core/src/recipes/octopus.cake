@@ -39,6 +39,22 @@ Task("CreateOctoPackage")
             else
                 Warning("Deploy.ps1 not found!");
             
+            if(FileExists("PreDeploy.ps1"))
+            {
+                Information("Copying PreDeploy.ps1...");
+                CopyFile("PreDeploy.ps1", webApp.CombineWithFilePath("PreDeploy.ps1"));
+            }
+            else
+                Warning("PreDeploy.ps1 not found!");
+
+            if(FileExists("PostDeploy.ps1"))
+            {
+                Information("Copying PostDeploy.ps1...");
+                CopyFile("PostDeploy.ps1", webApp.CombineWithFilePath("PostDeploy.ps1"));
+            }
+            else
+                Warning("PostDeploy.ps1 not found!");
+            
 
             DeleteFiles(webApp.FullPath + "/Web.*.config");
             DeleteFiles(webApp.FullPath + "/Web.config");
