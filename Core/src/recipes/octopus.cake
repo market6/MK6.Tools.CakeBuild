@@ -85,11 +85,15 @@ Task("CreateOctoRelease")
         }
 	}
 
+    var releaseNumber = parameters.Version.GitVersion.MajorMinorPatch;
+    if(!String.IsNullOrEmpty(parameters.Version.GitVersion.PreReleaseLabel))
+        releaseNumber += string.Format("{0}-{1}{2}", releaseNumber, parameters.Version.GitVersion.PreReleaseLabel, parameters.Version.GitVersion.CommitsSinceVersionSourcePadded);
+
     var settings = new CreateReleaseSettings {
             Server = EnvironmentVariable(octopusUrlVariable),
             ApiKey = EnvironmentVariable(octopusApiKeyVariable),
             EnableServiceMessages = true,
-            ReleaseNumber = string.Format("{0}.i-{1}{2}", parameters.Version.GitVersion.MajorMinorPatch, parameters.Version.GitVersion.PreReleaseLabel, parameters.Version.GitVersion.CommitsSinceVersionSourcePadded),
+            ReleaseNumber = string.Format("{0}-{1}{2}", parameters.Version.GitVersion.MajorMinorPatch, parameters.Version.GitVersion.PreReleaseLabel, parameters.Version.GitVersion.CommitsSinceVersionSourcePadded),
             DefaultPackageVersion = parameters.Version.SemVersion,
             ReleaseNotes = latestReleaseNotes
         };
