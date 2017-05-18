@@ -55,6 +55,11 @@ Task("CreateOctoPackage")
             else
                 Warning("PostDeploy.ps1 not found!");
             
+            var jsBuildDirSource = parameters.Paths.Directories.Source.Combine(webApp.GetDirectoryName()).Combine("Scripts/build");
+            var jsBuildDirTarget = webApp.Combine("Scripts/build");
+
+            if(DirectoryExists(jsBuildDirSource))
+                CopyDirectory(jsBuildDirSource, jsBuildDirTarget);
 
             DeleteFiles(webApp.FullPath + "/Web.*.config");
             DeleteFiles(webApp.FullPath + "/Web.config");
