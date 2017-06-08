@@ -1,4 +1,4 @@
-#addin "Cake.Npm"
+#addin nuget:?package=Cake.Npm&version=0.8.0
 
 // This is a locally published package which is nuget flavored official release.
 #tool "nuget:http://packages.mk6.local/api/?package=mk6-nodejs&version=6.8.1"
