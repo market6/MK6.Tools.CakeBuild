@@ -51,7 +51,7 @@ public class BuildParameters
             IsLocalBuild = buildSystem.IsLocalBuild,
             IsRunningOnUnix = context.IsRunningOnUnix(),
             IsRunningOnWindows = context.IsRunningOnWindows(),
-            IsMasterBranch = buildSystem.IsLocalBuild ? false : StringComparer.OrdinalIgnoreCase.Equals("master", context.EnvironmentVariable("vcsroot.branch")),
+            IsMasterBranch = buildSystem.IsLocalBuild ? false : StringComparer.OrdinalIgnoreCase.Equals("refs/heads/master", context.EnvironmentVariable("teamcity.build.vcs.branch.Mk6BitbucketCommon")),
             Slack = GetSlackCredentials(context),
             NuGet = GetNuGetCredentials(context),
             IsPublishBuild = new [] {
