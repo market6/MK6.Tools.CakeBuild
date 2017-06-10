@@ -99,4 +99,4 @@ Task("NugetPublishCore")
 });
 
 Task("NugetPublish")
-    .IsDependentOn("NuGetPackageCore");
+    .IsDependentOn("NuGetPackage");
