@@ -162,7 +162,7 @@ Task("Build")
 });
 
 Task("Package")
-    .IsDependentOn("Create-NuGet-Packages")
+    .IsDependentOn("NugetPackage")
     .IsDependentOn("Test");
 
 Task("Default")

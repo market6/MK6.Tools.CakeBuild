@@ -1,5 +1,4 @@
-Task("Create-NuGet-Packages")
-    .IsDependentOn("Build")
+Task("NuGetPackageCore")
     .WithCriteria(() => DirectoryExists(parameters.Paths.Directories.NugetNuspecDirectory))
     .Does(() =>
 {
@@ -35,11 +34,13 @@ Task("Create-NuGet-Packages")
             Symbols = enableSymbols,
             NoPackageAnalysis = true
         });
-    }
+    }    
 });
 
-Task("Publish-Nuget-Packages")
-    .IsDependentOn("Package")
+Task("NuGetPackage")
+    .IsDependentOn("Build");
+
+Task("NugetPublishCore")
     .WithCriteria(() => DirectoryExists(parameters.Paths.Directories.NuGetPackages))
     .Does(() =>
 {
@@ -88,7 +89,7 @@ Task("Publish-Nuget-Packages")
             Source = nugetSourceUrl,
             ApiKey = nugetApiKey
         });
-    }
+    }    
 })
 .OnError(exception =>
 {
@@ -96,3 +97,6 @@ Task("Publish-Nuget-Packages")
     Error(exception.ToString());
     publishingError = true;
 });
+
+Task("NugetPublish")
+    .IsDependentOn("NuGetPackageCore");
