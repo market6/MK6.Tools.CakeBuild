@@ -1,4 +1,5 @@
 Task("Transform")
+  .Description("")
   .Does(() =>
 {
   EnsureDirectoryExists(parameters.Paths.Directories.ConfigsDirectory);

@@ -9,6 +9,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 Task("Test-VSTest")
+    .Description("Executes tests using the vs test console runner. Finds tests to run using TestAssemblySearchPattern from the config.")
     .Does(() =>
 {
     var testsPattern = parameters.Paths.Directories.TempBuild + "/" + testAssemblySearchPattern;
@@ -28,8 +29,6 @@ Task("Test-VSTest")
 });
 
 Task("Test")
+    .Description("Depends on tasks Build and Test-VSTest")
     .IsDependentOn("Build")
-    .IsDependentOn("Test-VSTest")
-    .Does(() =>
-{
-});
+    .IsDependentOn("Test-VSTest");

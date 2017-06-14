@@ -10,6 +10,7 @@
 // TASK DEFINITIONS
 ///////////////////////////////////////////////////////////////////////////////
 Task("CreateOctoPackage")
+    .Description("Creates a octopus package for published websites or the msbuild OutDir for non-web apps. Depends on tasks Build, Test and Transform.")
     .IsDependentOn("Build")
     .IsDependentOn("Test")
     .IsDependentOn("Transform")
@@ -88,6 +89,7 @@ Task("CreateOctoPackage")
 });
 
 Task("CreateOctoRelease")
+    .Description("Creates an octopus release using the output from CreateOctoPackage. Depnds on task CreateOctoPackage.")
     .IsDependentOn("CreateOctoPackage")
     .Does(() =>
 {

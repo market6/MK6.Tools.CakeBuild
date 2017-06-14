@@ -67,6 +67,7 @@ Setup(context =>
 ///////////////////////////////////////////////////////////////////////////////
 
 Task("Show-Info")
+    .Description("Shows information about the current build")
     .Does(() =>
 {
     Information("Target: {0}", parameters.Target);
@@ -108,6 +109,7 @@ private void SetVariable(ICakeContext context, string variableName, string defau
 }
 
 Task("Clean")
+    .Description("Cleans directories: Build, TempBuild, TestResults, NuGetPackages.")
     .Does(() =>
 {
     Information("Cleaning...");
@@ -116,6 +118,7 @@ Task("Clean")
 });
 
 Task("Restore")
+    .Description("Executes a nuget restore using the specified solution file from the config")
     .Does(() =>
 {
     Information("Restoring {0}...", solutionFilePath);
@@ -144,6 +147,7 @@ Task("Restore")
 });
 
 Task("Build")
+    .Description("Executes msbuild using the specified solution file from the config. Depends on Show-Info, Clean and Restore tasks.")
     .IsDependentOn("Show-Info")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore")
@@ -162,15 +166,13 @@ Task("Build")
 });
 
 Task("Package")
-    .IsDependentOn("NugetPackage")
-    .IsDependentOn("Test");
+    .Description("Depends on Test and NugetPackage tasks.")
+    .IsDependentOn("Test")
+    .IsDependentOn("NugetPackage");
 
 Task("Default")
+    .Description("Default task that depends on Package task.")
     .IsDependentOn("Package");
-
-Task("ReleaseNotes");
-
-Task("ClearCache");
 
 ///////////////////////////////////////////////////////////////////////////////
 // EXECUTION

@@ -1,4 +1,5 @@
 Task("NuGetPackageCore")
+    .Description("Packages nuget packages using nuspecs found in ./nuspec/NuGet. Core tasks have no dependencies.")
     .WithCriteria(() => DirectoryExists(parameters.Paths.Directories.NugetNuspecDirectory))
     .Does(() =>
 {
@@ -38,9 +39,12 @@ Task("NuGetPackageCore")
 });
 
 Task("NuGetPackage")
-    .IsDependentOn("Build");
+    .Description("Depends on Build and NugetPackageCore.")
+    .IsDependentOn("Build")
+    .IsDependentOn("NugetPackageCore");
 
 Task("NugetPublishCore")
+    .Description("Publishes nuget packages. Core tasks have no dependencies.")
     .WithCriteria(() => DirectoryExists(parameters.Paths.Directories.NuGetPackages))
     .Does(() =>
 {
