@@ -124,13 +124,13 @@ Task("Restore")
     Information("Restoring {0}...", solutionFilePath);
     var sourceString = EnvironmentVariable(nuGetSourcesVariable);
     
-    if(!parameters.IsMasterBranch)
-    {
-        if(sourceString == null)
-            sourceString = string.Empty;
+    // if(!parameters.IsMasterBranch)
+    // {
+    //     if(sourceString == null)
+    //         sourceString = string.Empty;
         
-        sourceString += ";" + EnvironmentVariable(nuGetSourceCIUrlVariable);
-    }
+    //     sourceString += ";" + EnvironmentVariable(nuGetSourceCIUrlVariable);
+    // }
 
     if(parameters.IsLocalBuild)
     {
