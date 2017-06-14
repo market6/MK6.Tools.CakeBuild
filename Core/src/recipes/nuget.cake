@@ -67,12 +67,12 @@ Task("NugetPublishCore")
     }
     else
     {
-        if(!parameters.IsMasterBranch)
-        {
-            Information("Setting nuget CI variables...");
-            nugetSourceUrl = EnvironmentVariable(nuGetSourceCIUrlVariable);
-            nugetApiKey = EnvironmentVariable(nuGetApiKeyCIUrlVariable);
-        }
+        // if(!parameters.IsMasterBranch)
+        // {
+        //     Information("Setting nuget CI variables...");
+        //     nugetSourceUrl = EnvironmentVariable(nuGetSourceCIUrlVariable);
+        //     nugetApiKey = EnvironmentVariable(nuGetApiKeyCIUrlVariable);
+        // }
 
         if(string.IsNullOrEmpty(nugetApiKey)) {
             throw new InvalidOperationException("Could not resolve NuGet API key.");
