@@ -21,6 +21,6 @@ static string nugetEnableSymbolsDefaultValue = "NUGET_ENABLE_SYMBOLS";
 
 static string localNugetSourceVariable = "LOCAL_NUGET_SOURCE";
 static string localNugetSourceDefaultValue = "c:\\packages";
-static string klondikeUrlDefault ="http://packages.mk6.local/odata/api";
-static string klondikeCIUrlDefault ="http://packages.mk6.local:8888/odata/api";
+static string klondikeUrlDefault ="http://packages.mk6.local";
+static string klondikeCIUrlDefault ="http://packages.mk6.local:8888";
 static string nugetSourcesDefaultValue = klondikeUrlDefault;
