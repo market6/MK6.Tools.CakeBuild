@@ -47,7 +47,7 @@ Param(
     [string]$Verbosity = "Verbose",
     [string]$AppVer = "1.0.0",
     [string]$SolutionPath,
-    [switch]$Experimental,
+    [switch]$Experimental = $true,
     [Alias("DryRun","Noop")]
     [switch]$WhatIf,
     [switch]$Mono,
