@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>MK6.Tools.CakeBuild.Core</id>
+    <id>NewBuildTest.Lib</id>
     <version>$version$</version>
     <authors>Market6</authors>
     <owners>Market6</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Core cake scripts</description>
+    <description>NewBuildTest.Lib</description>
+    <references>
+      <reference file="NewBuildTest.Lib.dll" />
+    </references>
   </metadata>
   <files>
-    <file src="recipes/" target="" />
+    <file src="NewBuildTest.Lib.*" target="lib\net461" />
+    <file src="src\NewBuildTest.Lib\" target="src" />
   </files>
 </package>
