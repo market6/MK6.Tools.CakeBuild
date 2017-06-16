@@ -8,6 +8,8 @@ Setup(context =>
     version = context.GitVersion();
     context.Information("Version: {0}", version.FullSemVer);
     context.Information("Package Version: {0}", version.NuGetVersionV2);
+    if(TeamCity.IsRunningOnTeamCity)
+        TeamCity.SetBuildNumber(version.FullSemVer);
 });
 
 Task("Package")
