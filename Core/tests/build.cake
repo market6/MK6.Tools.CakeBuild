@@ -1,3 +1,19 @@
+Task("VerifyLPM")
+  .Does(() =>
+{
+  var fileSystemType = Context.FileSystem.GetType();
+
+  if (fileSystemType.ToString()=="Cake.LongPath.Module.LongPathFileSystem")
+  {
+      Information("Sucessfully loaded {0}", fileSystemType.Assembly.Location);
+  }
+  else
+  {
+      Error("Failed to load Cake.LongPath.Module");
+  }
+
+});
+
 #l ..\src\recipes\addins.cake
 #l ..\src\recipes\tools.cake
 
