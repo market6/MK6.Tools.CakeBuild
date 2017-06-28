@@ -41,11 +41,16 @@ Setup(context =>
         )
     );
 
+    if(TeamCity.IsRunningOnTeamCity)
+        TeamCity.SetBuildNumber(parameters.Version.SemVersion);
+
     Information("Building version {0} of " + title + " ({1}, {2}) using version {3} of Cake.)",
         parameters.Version.SemVersion,
         parameters.Configuration,
         parameters.Target,
         parameters.Version.CakeVersion);
+
+    
 
     SetupDefaultEnvironment(context, parameters);
 });
