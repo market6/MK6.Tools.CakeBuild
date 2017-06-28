@@ -63,8 +63,8 @@ public class BuildVersion
     public static string ReleaseNumber(GitVersion gitVersion)
     {
         var releaseTag = gitVersion.BranchName == "master"
-            ? releaseTag = gitVersion.PreReleaseTag;
-            : releaseTag = gitVersion.PreReleaseTagWithDash;
+            ? gitVersion.PreReleaseTag
+            : gitVersion.PreReleaseTagWithDash;
 
         return string.Format("{0}{1}", gitVersion.MajorMinorPatch, releaseTag);                 
     }
