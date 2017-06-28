@@ -5,6 +5,9 @@ var target = Argument("target", "Default");
 
 Setup(context =>
 {
+    if(TeamCity.IsRunningOnTeamCity)
+        StartProcess("git", "fetch --tags");
+
     version = context.GitVersion();
     context.Information("Version: {0}", version.FullSemVer);
     context.Information("Package Version: {0}", version.NuGetVersionV2);
