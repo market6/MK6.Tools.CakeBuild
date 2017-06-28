@@ -25,18 +25,6 @@ public class BuildVersion
         if (context.IsRunningOnWindows())
         {
             context.Information("Calculating Semantic Version...");
-            if (!parameters.IsLocalBuild || parameters.IsPublishBuild || parameters.IsReleaseBuild)
-            {
-                context.GitVersion(new GitVersionSettings{
-                    UpdateAssemblyInfoFilePath = parameters.Paths.Files.SolutionInfoFilePath,
-                    UpdateAssemblyInfo = true,
-                    OutputType = GitVersionOutput.BuildServer
-                });
-
-                version = context.EnvironmentVariable("GitVersion_MajorMinorPatch");
-                semVersion = context.EnvironmentVariable("GitVersion_LegacySemVerPadded");
-                milestone = string.Concat(version);
-            }
 
             GitVersion assertedVersions = context.GitVersion(new GitVersionSettings
             {
@@ -44,7 +32,7 @@ public class BuildVersion
             });
 
             version = assertedVersions.MajorMinorPatch;
-            semVersion = assertedVersions.LegacySemVerPadded;
+            semVersion = ReleaseNumber(assertedVersions);
             milestone = string.Concat(version);
             gitVersion = assertedVersions;
             context.Information("Calculated Semantic Version: {0}", semVersion);
@@ -70,5 +58,14 @@ public class BuildVersion
             GitVersion = gitVersion,
             IsPreRelease = !string.IsNullOrEmpty(gitVersion.PreReleaseLabel)
         };
+    }
+
+    public static string ReleaseNumber(GitVersion gitVersion)
+    {
+        var releaseTag = gitVersion.BranchName == "master"
+            ? gitVersion.PreReleaseTag
+            : gitVersion.PreReleaseTagWithDash;
+
+        return string.Format("{0}{1}", gitVersion.MajorMinorPatch, releaseTag);                 
     }
 }
