@@ -4,7 +4,7 @@ Task("Transform")
 {
   EnsureDirectoryExists(parameters.Paths.Directories.ConfigsDirectory);
   CleanDirectories(parameters.Paths.Directories.ConfigsDirectory.FullPath);
-  //TODO: Add support for web.configs
+  
   var appConfigGlobPattern = parameters.Paths.Directories.TempBuild.FullPath + "/App.*.Config";
   Information("Performing transforms on app configs using glob pattern: {0}", appConfigGlobPattern);
   foreach(var file in GetFiles(appConfigGlobPattern))
@@ -19,8 +19,32 @@ Task("Transform")
 
   var webConfigGlobPattern = parameters.Paths.Directories.PublishedWebsites.FullPath + "/**/Web.*.Config";
   Information("Performing transforms on web configs using glob pattern: {0}", webConfigGlobPattern);
+  
+  //Transform release config first--use the result as the source for the env transforms
+  var releaseConfigGlob = parameters.Paths.Directories.PublishedWebsites.FullPath + "/**/Web.Release.config";
+  Information("Looking for release config using glob pattern: {0}", releaseConfigGlob);
+
+  var releaseConfig = GetFiles(releaseConfigGlob).FirstOrDefault();
+  if(releaseConfig != null)
+  {
+    Information("Transforming Release Config");
+    var sourceFile = releaseConfig.GetDirectory().CombineWithFilePath("web.config");
+    var targetFile = releaseConfig.GetDirectory().CombineWithFilePath("web.config.tmp");
+    XdtTransformConfig(sourceFile, releaseConfig, targetFile);
+    DeleteFile(sourceFile);
+    MoveFile(targetFile, sourceFile);
+  }
+  else
+    Warning("Skipping release transform...release config not found!");
+    
   foreach(var file in GetFiles(webConfigGlobPattern))
   {
+      if(file.FullPath.EndsWith("Web.Release.config", StringComparison.OrdinalIgnoreCase))
+      {
+        Verbose("Skipping release config: {0}", file.FullPath);
+        continue;
+      }
+
       Information("Transform: {0}", file);
       TransormConfigs(Context, file, parameters.Paths.Directories.ConfigsDirectory);
   }
