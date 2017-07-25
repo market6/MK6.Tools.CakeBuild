@@ -108,11 +108,22 @@ Task("CreateOctoRelease")
         }
 	}
 
+    var releaseNumber = BuildVersion.ReleaseNumber(parameters.Version.GitVersion);
+
+    if(!String.IsNullOrEmpty(config.OctopusReleaseNumberFormat))
+    {
+        releaseNumber = config.OctopusReleaseNumberFormat
+            .Replace("{MajorMinorPatch}", parameters.Version.GitVersion.MajorMinorPatch.ToString())
+            .Replace("{Major}", parameters.Version.GitVersion.Major.ToString())
+            .Replace("{Minor}", parameters.Version.GitVersion.Minor.ToString())
+            .Replace("{Patch}", parameters.Version.GitVersion.Patch.ToString());
+    }
+
     var settings = new CreateReleaseSettings {
             Server = EnvironmentVariable(octopusUrlVariable),
             ApiKey = EnvironmentVariable(octopusApiKeyVariable),
             EnableServiceMessages = true,
-            ReleaseNumber = BuildVersion.ReleaseNumber(parameters.Version.GitVersion),
+            ReleaseNumber = releaseNumber,
             DefaultPackageVersion = parameters.Version.SemVersion,
             ReleaseNotes = latestReleaseNotes
         };

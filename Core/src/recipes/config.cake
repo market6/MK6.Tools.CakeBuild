@@ -10,6 +10,7 @@ public class Config
   public string OctopusProjectName { get; set; }
   public string TestAssemblySearchPattern { get; set; }
   public string NodeJsDirectoryPath { get; set; }
+  public string OctopusReleaseNumberFormat { get; set; }
 
   public static Config BuildJsonConfig(string configPath)
   {
