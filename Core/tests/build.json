@@ -4,5 +4,13 @@
   "SolutionFilePath": "NewBuildTest/NewBuildTest.sln",
   "SolutionDirectoryPath": "NewBuildTest",
   "OctopusProjectName": "NewBuildTest",
-  "OctopusReleaseNumberFormat" : "{MajorMinorPatch}.i"
+  "OctopusReleaseOptions": {
+    "ReleaseNumberFormat": "{MajorMinorPatch}.i",
+    "AdditionalPackageFiles": [
+      {
+        "Source": "content",
+        "Target": "content"
+      }
+    ]
+  }
 }

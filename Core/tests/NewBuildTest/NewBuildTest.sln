@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewBuildTest.App", "NewBuil
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewBuildTest.Lib", "NewBuildTest.Lib\NewBuildTest.Lib.csproj", "{8F583367-D8D5-4FF6-8732-1EE73D2A0917}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewBuildTest.Tests", "NewBuildTest.Tests\NewBuildTest.Tests.csproj", "{63E877F5-89DB-441D-9F32-EEBE13E2882D}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewBuildTest.WebApp", "NewBuildTest.WebApp\NewBuildTest.WebApp.csproj", "{18CC18A3-8441-4C3C-84B8-6D258CE3BE49}"
 EndProject
 Global

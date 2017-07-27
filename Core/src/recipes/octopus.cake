@@ -56,11 +56,22 @@ Task("CreateOctoPackage")
             else
                 Warning("PostDeploy.ps1 not found!");
             
-            var jsBuildDirSource = parameters.Paths.Directories.Source.Combine(webApp.GetDirectoryName()).Combine("Scripts/build");
-            var jsBuildDirTarget = webApp.Combine("Scripts/build");
-
-            if(DirectoryExists(jsBuildDirSource))
-                CopyDirectory(jsBuildDirSource, jsBuildDirTarget);
+            if(config.OctopusReleaseOptions != null && config.OctopusReleaseOptions.AdditionalPackageFiles != null)
+            {
+                foreach(var apf in config.OctopusReleaseOptions.AdditionalPackageFiles)
+                {
+                    var source = parameters.Paths.Directories.Source.Combine(webApp.GetDirectoryName()).Combine(apf.Source);
+                    var target = webApp.Combine(apf.Target);
+                    if(DirectoryExists(source))
+                    {
+                        CopyDirectory(source, target);
+                        Information("Finished copy of additional files: {0} -> {1}", source, target);
+                    }
+                    else
+                        Warning("{0} not found!", source);
+                        
+                }    
+            }
 
             DeleteFiles(webApp.FullPath + "/Web.*.config");
             DeleteFiles(webApp.FullPath + "/Web.config");
@@ -110,9 +121,9 @@ Task("CreateOctoRelease")
 
     var releaseNumber = BuildVersion.ReleaseNumber(parameters.Version.GitVersion);
 
-    if(!String.IsNullOrEmpty(config.OctopusReleaseNumberFormat))
+    if(config.OctopusReleaseOptions != null && !String.IsNullOrEmpty(config.OctopusReleaseOptions.ReleaseNumberFormat))
     {
-        releaseNumber = config.OctopusReleaseNumberFormat
+        releaseNumber = config.OctopusReleaseOptions.ReleaseNumberFormat
             .Replace("{MajorMinorPatch}", parameters.Version.GitVersion.MajorMinorPatch.ToString())
             .Replace("{Major}", parameters.Version.GitVersion.Major.ToString())
             .Replace("{Minor}", parameters.Version.GitVersion.Minor.ToString())
