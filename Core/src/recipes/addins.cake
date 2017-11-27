@@ -2,5 +2,5 @@
 // ADDINS
 ///////////////////////////////////////////////////////////////////////////////
 
-#addin nuget:?package=Cake.Slack
-#addin nuget:?package=Cake.XdtTransform
+#addin nuget:?package=Cake.Slack&version=0.7.0
+#addin nuget:?package=Cake.XdtTransform&version=0.11.0
