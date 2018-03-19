@@ -1,4 +1,4 @@
-#addin "Cake.Incubator&version=2.0.0"
+#addin "nuget:?package=Cake.Incubator&version=2.0.0"
 
 ///////////////////////////////////////////////////////////////////////////////
 // TOOLS
